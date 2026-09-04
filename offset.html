@@ -1,0 +1,382 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Offset — Delfina Contini</title>
+  <link rel="icon" type="image/svg+xml" href="img/favicon.svg">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    :root{
+      --bg:#fff;--ink:#111;--line:rgba(17,17,17,.15);--pad:clamp(1.2rem,3vw,3rem);
+      /* same vertical rhythm system as the rest of the site */
+      --space-top:clamp(90px,18vw,140px);
+      --space-section:clamp(2.75rem,6vw,4.5rem);
+      --space-tight:clamp(1rem,2.5vw,1.75rem);
+    }
+    html,body{background:var(--bg);color:var(--ink);font-family:'DM Mono',monospace;margin:0}
+    /* NAV (same as the rest of the site) */
+    .topbar{position:fixed;left:0;right:0;top:0;background:var(--bg);border-bottom:none;z-index:1110}
+    .topbar .container{width:100%;margin:0 auto;padding:28px calc(var(--pad) + 0.25rem);display:flex;align-items:center;justify-content:flex-end;gap:60px;position:relative}
+    .nav-logo{position:absolute;left:calc(var(--pad) + 0.25rem);top:50%;transform:translateY(-50%);display:flex;align-items:center;color:#111}
+    .nav-logo svg{height:40px;width:auto;display:block}
+    .nav-links{display:flex;gap:24px;align-items:center;justify-content:flex-end;flex-wrap:nowrap;white-space:nowrap}
+    .nav-links a{position:relative;display:inline-flex;align-items:center;font-family:'DM Mono',monospace;font-size:14px;letter-spacing:.28em;text-transform:uppercase;text-decoration:none;color:var(--ink);transition:color .2s ease}
+    .nav-links a::after{content:'';position:absolute;left:0;bottom:-2px;width:0;height:1px;background:var(--ink);transition:width .3s cubic-bezier(.22,1,.36,1)}
+    .nav-links a:hover::after,.nav-links a:focus-visible::after{width:100%}
+    .nav-links a.active::after{width:100%}
+    .nav-links .sep{width:1px;height:12px;background:var(--line);display:inline-block}
+
+    /* page container */
+    main{max-width:1200px;margin:var(--space-top) auto 0;padding:0 var(--pad)}
+    .nav-checkbox:checked ~ .topbar .menu-toggle span:nth-child(1){transform:translateY(8.5px) rotate(45deg)}
+    .nav-checkbox:checked ~ .topbar .menu-toggle span:nth-child(2){opacity:0}
+    .nav-checkbox:checked ~ .topbar .menu-toggle span:nth-child(3){transform:translateY(-8.5px) rotate(-45deg)}
+
+    /* back link */
+    .project-back{display:inline-flex;align-items:center;gap:.4em;font-family:'DM Mono',monospace;font-size:12px;letter-spacing:.14em;text-transform:uppercase;text-decoration:none;color:var(--ink);opacity:.6;margin-bottom:var(--space-tight);transition:opacity .2s ease}
+    .project-back:hover,.project-back:focus-visible{opacity:1;text-decoration:underline;text-underline-offset:3px}
+    .project-back svg{width:12px;height:12px;transform:rotate(180deg)}
+
+    .pretitle{font-family:'DM Mono',monospace;font-size:13px;letter-spacing:.2em;text-transform:uppercase;margin-bottom:8px}
+    .page-title{font-family:'Switzer',sans-serif;font-weight:700;font-size:clamp(2.4rem,6vw,4rem);line-height:.95;text-transform:uppercase;margin:0 0 20px}
+    .lead{font-family:'Switzer',sans-serif;font-size:16px;line-height:1.6;max-width:44ch;margin:0 0 20px}
+    .project-meta{display:flex;flex-wrap:wrap;gap:8px 20px;font-family:'DM Mono',monospace;font-size:13px;letter-spacing:.06em;text-transform:uppercase;opacity:.7}
+
+    /* HERO: photo left, intro right — same layout as kairo.html / eterna.html / tinta.html */
+    .project-hero{display:grid;grid-template-columns:1.3fr 1fr;gap:56px;align-items:start;padding-bottom:var(--space-section)}
+    .project-video{width:100%}
+
+    /* closing bookend photo, full-bleed */
+    .hero-full{position:relative;width:100vw;margin-left:calc(50% - 50vw);height:80vh;min-height:440px;max-height:760px;overflow:hidden}
+    .hero-full img{width:100%;height:100%;object-fit:cover;display:block}
+
+    /* ABOUT */
+    .section-block{padding-bottom:var(--space-section)}
+    .section-heading{font-family:'Switzer',sans-serif;font-weight:700;font-size:14px;letter-spacing:.06em;text-transform:uppercase;margin:0 0 24px}
+    .project-text-block{font-family:'Switzer',sans-serif;font-size:16px;line-height:1.7;max-width:52ch;margin:0}
+
+    /* image zoom-on-hover, used on every photo in the body */
+    .img-zoom{overflow:hidden;display:block;width:100%;height:100%}
+    .img-zoom img{display:block}
+
+    /* fade + rise as each block scrolls into view */
+    .scroll-in{opacity:0;transform:translateY(1.5rem);transition:opacity .75s cubic-bezier(.22,1,.36,1),transform .75s cubic-bezier(.22,1,.36,1)}
+    .scroll-in.is-visible{opacity:1;transform:none}
+    @media (prefers-reduced-motion:reduce){.scroll-in{opacity:1;transform:none;transition:none}}
+
+    /* logo + tagline lockup, centered on white between the hero and the image sequence */
+    .logo-lockup{display:flex;align-items:center;justify-content:center;padding-top:var(--space-section)}
+    .logo-lockup img{width:100%;height:auto;display:block}
+
+    /* full-bleed color palette band */
+    .palette-band{width:100%;display:flex;height:150px}
+    .palette-band .swatch{flex:1;display:flex;align-items:flex-end;justify-content:center;padding-bottom:12px}
+    .palette-band .swatch span{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.04em}
+    .palette-band .swatch:nth-child(1) span,.palette-band .swatch:nth-child(2) span{color:#fff}
+    .palette-band .swatch:nth-child(3) span,.palette-band .swatch:nth-child(4) span{color:#111}
+
+    /* full-bleed texture strip — tiled at native resolution so it stays sharp instead of being stretched */
+    .strip{width:100%;height:220px;margin-bottom:var(--space-tight);background-image:url('offset/pattern-final.jpg');background-repeat:no-repeat;background-position:center;background-size:cover}
+
+    /* full-bleed image rows: the case study is told through the images themselves, edge to edge */
+    .img-row{width:100%;display:grid;gap:20px;margin-bottom:20px}
+    .img-row.cols-1{grid-template-columns:1fr}
+    .img-row.cols-2{grid-template-columns:1fr 1fr}
+    .img-row.cols-3{grid-template-columns:1fr 1fr 1fr}
+    .devices-row{background:#0f0f0f;gap:0;padding:32px;margin-bottom:var(--space-section)}
+    .dark-block{background:#0f0f0f;gap:0;padding:32px;margin-bottom:0}
+    .text-panel{background:#1B1E21;display:flex;align-items:flex-end;justify-content:flex-start;padding:32px}
+    .text-panel p{font-family:'Switzer',sans-serif;font-size:13px;line-height:1.6;color:#fff;opacity:.7;max-width:26ch;text-align:left;margin:0}
+    .text-block{padding:var(--space-section) 0;margin:0}
+    .img-row img{width:100%;height:100%;object-fit:contain;display:block}
+    .img-row img.moodboard-cover,.img-row img.fill-cover{object-fit:cover}
+    .natural-height{height:auto}
+    .natural-height img{height:auto}
+    .img-row.h-lg{height:480px}
+    .img-row.h-md{height:380px}
+    .img-row.h-sm{height:260px}
+
+    /* prev/next project nav */
+    .project-nav{display:flex;justify-content:space-between;gap:20px;padding-bottom:var(--space-section);border-top:1px solid var(--line);padding-top:var(--space-tight)}
+    .project-nav a{font-family:'DM Mono',monospace;font-size:13px;letter-spacing:.1em;text-transform:uppercase;text-decoration:none;color:var(--ink);opacity:.7;transition:opacity .2s ease}
+    .project-nav a:hover,.project-nav a:focus-visible{opacity:1;text-decoration:underline;text-underline-offset:3px}
+
+    .cursor-dot.white{background:#fff;border-color:#fff}
+    .cursor-dot.white.is-link{background:transparent}
+
+    /* footer (same as the rest of the site) */
+    footer.site-footer{background:#111;color:#fff;padding:64px var(--pad);margin-top:0}
+    .footer-inner{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr 1fr;align-items:center}
+    .footer-left a{font-family:'DM Mono',monospace;color:#fff;text-decoration:none;font-size:15px;letter-spacing:.18em;transition:text-decoration .15s ease;text-underline-offset:3px}
+    .footer-left a:hover,.footer-left a:focus-visible{text-decoration:underline}
+    .footer-center{text-align:center;position:relative;min-height:140px}
+    .footer-center::before{content:'';position:absolute;left:50%;top:54%;transform:translate(-50%,-50%);width:520px;height:180px;background-image:url('img/firma.png');background-size:contain;background-repeat:no-repeat;background-position:center center;opacity:.52;pointer-events:none}
+    .footer-center .name{font-family:Switzer, 'Switzer', sans-serif;font-weight:700;font-size:56px;line-height:0.9;letter-spacing:.02em;color:#fff;position:relative;z-index:2}
+    .footer-center .sub{font-family:'DM Mono',monospace;font-size:13px;opacity:.9;color:#fff;position:relative;z-index:2;margin-top:8px}
+    .footer-right{display:flex;flex-direction:column;align-items:flex-end;gap:6px}
+    .footer-right a{color:#fff;font-family:'DM Mono',monospace;font-size:15px;text-decoration:none;display:inline-flex;align-items:center;gap:.4em;transition:color .25s ease}
+    .footer-right a::after{content:'↗';display:inline-block;transform:translate(0,0);transition:transform .3s cubic-bezier(.22,1,.36,1)}
+    .footer-right a:hover::after,.footer-right a:focus-visible::after{transform:translate(3px,-3px)}
+
+    /* right fixed progress line */
+    .right-line{position:fixed;right:14px;top:0;bottom:0;width:1px;background:var(--line);z-index:900}
+    .right-line .dot{position:fixed;right:10px;width:8px;height:8px;background:#111;border-radius:50%;transform:translateY(0);transition:transform .25s ease}
+
+    @media (max-width:920px){
+      .project-hero{grid-template-columns:1fr;gap:32px}
+    }
+
+    @media (max-width:600px){
+      .topbar .nav-links{display:none}
+      .topbar .container{padding-top:36px;padding-bottom:36px}
+      .menu-toggle{position:absolute;top:50%;right:calc(var(--pad) + 0.25rem);transform:translateY(-50%)}
+      .page-title{font-size:clamp(2.1rem,10vw,2.7rem)}
+      .hero-full{height:62vh;min-height:360px}
+      .logo-lockup{padding-top:var(--space-tight)}
+      .palette-band{height:90px}
+      .img-row.cols-2,.img-row.cols-3{grid-template-columns:1fr}
+      .img-row.h-lg{height:260px}
+      .img-row.h-md{height:220px}
+      .img-row.h-sm{height:170px}
+      .img-row.cols-2.h-md,.img-row.cols-2.h-lg,.img-row.cols-3.h-md,.img-row.cols-3.h-lg{height:auto}
+      .img-row.cols-2.h-md img,.img-row.cols-2.h-lg img,.img-row.cols-3.h-md img,.img-row.cols-3.h-lg img{height:180px}
+      /* moodboard: not cropped on mobile, scales to its own full height */
+      .img-row .img-zoom:has(img.moodboard-cover){height:auto}
+      .img-row img.moodboard-cover{height:auto;object-fit:contain}
+      /* single full-width photos: scale up to fill the width instead of shrinking inside a short fixed height */
+      .img-row.cols-1{height:auto}
+      .img-row.cols-1 img{height:auto}
+      .full-mobile{height:auto}
+      .full-mobile img{height:auto}
+      .text-panel{padding:32px 1.2rem;height:180px}
+      .strip{height:150px}
+      footer.site-footer{padding:48px 1.2rem}
+      .footer-inner{display:flex;flex-direction:column;align-items:center;gap:18px;text-align:center}
+      .footer-left,.footer-center,.footer-right{width:100%}
+      .footer-right{flex-direction:row;justify-content:center;align-items:center;flex-wrap:wrap;gap:10px;order:3}
+      .footer-left{order:1}
+      .footer-center{order:2;min-height:220px;position:relative;padding-top:24px}
+      .footer-left a,.footer-right a{font-size:13px;letter-spacing:.16em}
+      .footer-center::before{display:block;opacity:.45;top:44%;left:50%;transform:translate(-50%,-50%);width:320px;height:120px}
+    }
+  </style>
+</head>
+<body>
+  <input type="checkbox" id="navToggle" class="nav-checkbox" aria-hidden="true" tabindex="-1">
+
+  <header class="topbar">
+    <div class="container">
+      <a class="nav-logo" href="index.html" aria-label="Home">
+        <svg viewBox="0 0 48 42" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M14.5477 4.14182C14.0694 3.76354 12.38 2.65353 10.8429 2.06797C9.70813 1.63565 8.21659 2.02297 7.09017 2.82459C5.40107 4.02664 4.70456 6.35089 3.74787 8.89742C3.09802 10.6272 2.37964 13.3392 1.7778 16.5688C1.17597 19.7984 0.780238 23.4873 0.592293 25.8371C0.332992 29.079 0.654361 30.9456 1.12999 32.8289C1.62068 34.7719 2.66458 36.4165 3.64028 37.8291C4.59182 39.2066 5.96069 40.1141 7.19919 40.8257C8.30436 41.4607 9.60536 41.5046 10.8737 41.5C12.1891 41.4952 13.6607 40.4374 15.3796 38.7312C16.3524 37.7655 17.2322 36.319 18.1118 34.7573C18.9915 33.1957 19.7684 31.4916 20.6818 28.6981C21.5952 25.9047 22.6216 22.0733 23.3295 17.5185C24.0375 12.9637 24.396 7.80147 24.5462 4.88712C24.6965 1.97277 24.6276 1.46275 24.4895 0.869154C24.3513 0.275555 24.1459 -0.386164 24.3753 5.69495C24.6047 11.7761 25.2751 24.6201 24.4999 26.9172C23.7248 29.2143 21.4838 20.5753 20.2821 15.7907C19.0804 11.006 18.9859 10.3374 19.1337 9.885C19.4005 9.0678 22.48 8.19874 26.5392 6.93036C30.9327 5.55752 33.7608 6.18245 34.2996 6.36958C34.7454 6.52441 34.9683 7.2256 35.1982 8.30676C35.5163 9.80279 35.4795 12.1259 35.3394 15.0134C35.2677 16.4927 34.9537 17.9839 34.1862 20.1138C33.4188 22.2436 32.1459 24.9627 30.0394 28.3926C27.933 31.8225 25.0316 35.8808 23.533 37.887C22.0344 39.8932 22.0265 39.7242 22.1079 39.3837C22.1893 39.0432 22.3604 38.5363 24.6735 34.4556C26.9866 30.375 31.4366 22.7359 35.4914 16.6428C39.5463 10.5497 43.0713 6.23421 44.9881 3.91347C46.9049 1.59272 47.1067 1.39754 47.5 1.10879" stroke="black" stroke-linecap="round"/>
+        </svg>
+      </a>
+      <nav class="nav-links" aria-label="Main navigation">
+        <a href="projects.html" class="active">Projects</a>
+        <span class="sep" aria-hidden="true"></span>
+        <a href="about.html">About me</a>
+        <span class="sep" aria-hidden="true"></span>
+        <a href="contact.html">Contact me</a>
+      </nav>
+      <label class="menu-toggle" for="navToggle" role="button" aria-label="Toggle menu">
+        <span></span><span></span><span></span>
+      </label>
+    </div>
+  </header>
+
+  <main>
+    <a class="project-back" href="projects.html">
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M7 17 L17 7 M8.5 7 L17 7 L17 15.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      All projects
+    </a>
+
+    <!-- HERO: photo + intro (name, short description, year, categories) -->
+    <section class="project-hero reveal d1">
+      <div class="project-video">
+        <img src="offset/hero-billboard.jpg" alt="OFFSET street-level ad, showing the logo and the tagline The Slight Shift" style="width:100%;aspect-ratio:16/9;object-fit:cover;display:block">
+      </div>
+      <div class="project-intro">
+        <div class="pretitle">PROJECT</div>
+        <h1 class="page-title">Offset</h1>
+        <div class="project-meta">
+          <span>2026</span>
+          <span>Personal Project</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ABOUT -->
+    <section class="section-block scroll-in">
+      <h2 class="section-heading">About</h2>
+      <p class="project-text-block">OFFSET is a contemporary eyewear brand built around the idea of The Slight Shift — the belief that a subtle change can transform the way we see and express ourselves.</p>
+    </section>
+
+    <div class="logo-lockup scroll-in">
+      <img src="offset/logo.png" alt="OFFSET logo mark, with the tagline The Slight Shift">
+    </div>
+
+    <div class="palette-band scroll-in">
+      <div class="swatch" style="background:#1B1E21"><span>#1B1E21</span></div>
+      <div class="swatch" style="background:#343A40"><span>#343A40</span></div>
+      <div class="swatch" style="background:#D6D9DE"><span>#D6D9DE</span></div>
+      <div class="swatch" style="background:#ECECEC"><span>#ECECEC</span></div>
+    </div>
+
+    <div class="strip scroll-in" role="img" aria-label="OFFSET wordmark pattern, used across packaging" style="margin-bottom:0"></div>
+
+    <!-- the case study from here on is told through the work itself -->
+    <div class="img-row cols-1 h-lg scroll-in" style="margin-bottom:0">
+      <div class="img-zoom"><img src="offset/trio-bags-catalog-keychain.jpg" alt="OFFSET bags, collection catalog and keychain"></div>
+    </div>
+
+    <div class="text-block scroll-in">
+      <p class="project-text-block">The brand reimagines eyewear as an everyday object with a distinct point of view, balancing fashion and functionality.</p>
+    </div>
+
+    <div class="img-row cols-1 natural-height scroll-in" style="margin-top:var(--space-section)">
+      <div class="img-zoom"><img src="offset/trio-spray-envelope-box.jpg" alt="OFFSET lens spray, postcard envelope and box with glasses"></div>
+    </div>
+
+    <div class="img-row cols-1 natural-height scroll-in" style="margin-bottom:0">
+      <div class="img-zoom"><img src="offset/positioning-guide.jpg" alt="OFFSET care guide and printed sheets, EST. 2026, with a pair of glasses"></div>
+    </div>
+
+    <div class="text-block scroll-in">
+      <p class="project-text-block">From the identity and packaging to the product naming and art direction, every element was designed around the same idea: finding something different in the familiar.</p>
+    </div>
+
+    <div class="img-row cols-1 h-lg scroll-in" style="margin-bottom:var(--space-section)">
+      <div class="img-zoom"><img src="offset/instagram-posts.jpg" alt="OFFSET Instagram grid, showing six posts"></div>
+    </div>
+
+    <div class="img-row cols-1 h-lg scroll-in" style="margin-bottom:var(--space-section)">
+      <div class="img-zoom"><img src="offset/instagram-stories.jpg" alt="OFFSET Instagram story templates"></div>
+    </div>
+
+    <div class="img-row cols-1 natural-height scroll-in" style="margin-bottom:var(--space-section)">
+      <div class="img-zoom"><img src="offset/mobile-desktop.jpg" alt="OFFSET Instagram profile and website, shown on a phone and laptop"></div>
+    </div>
+
+    <!-- CLOSE: bookend the page on the same statement it opened on -->
+    <div class="hero-full scroll-in" style="margin-bottom:0">
+      <img src="offset/closing.jpg" alt="OFFSET campaign close-up — offset, the slight shift">
+    </div>
+
+    <nav class="project-nav" style="max-width:1200px;margin:0 auto;padding:var(--space-tight) var(--pad) var(--space-section)">
+      <a href="projects.html">← All projects</a>
+      <a href="eterna.html">Next: Eterna →</a>
+    </nav>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-left"><a href="mailto:delfinacontini0@gmail.com">CONTACT ME</a></div>
+      <div class="footer-center"><div class="name">DELFINA<br>CONTINI</div><div class="sub">BS AS, ARGENTINA</div></div>
+      <div class="footer-right">
+        <a href="https://www.behance.net/delfinacontini1" target="_blank" rel="noopener">BEHANCE</a>
+        <a href="https://www.instagram.com/delfinacontini/" target="_blank" rel="noopener">INSTAGRAM</a>
+        <a href="https://www.linkedin.com/in/delfina-contini" target="_blank" rel="noopener">LINKED IN</a>
+      </div>
+    </div>
+  </footer>
+
+  <div class="right-line" aria-hidden="true"></div>
+  <div class="right-line">
+    <div class="dot" id="progressDot"></div>
+  </div>
+
+  <div class="cursor-dot" aria-hidden="true"></div>
+
+  <button type="button" class="to-top" aria-label="Back to top">
+    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M12 19V5M12 5L6 11M12 5L18 11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </button>
+
+  <nav class="mobile-menu" id="mobileMenu" aria-hidden="true" aria-label="Mobile navigation">
+    <a href="projects.html" class="active">Projects</a>
+    <a href="about.html">About me</a>
+    <a href="contact.html">Contact me</a>
+  </nav>
+
+  <script>
+    (function(){
+      var dot=document.getElementById('progressDot');
+      var line=document.querySelector('.right-line');
+      if(!dot||!line) return;
+      function update(){
+        var scrollTop=window.scrollY;
+        var docHeight=document.documentElement.scrollHeight - window.innerHeight;
+        var progress=docHeight>0? scrollTop/docHeight : 0;
+        var top= Math.max(40, 40 + progress*(window.innerHeight - 90));
+        dot.style.transform='translateY('+top+'px)';
+      }
+      update();window.addEventListener('scroll',update);window.addEventListener('resize',update);
+    })();
+
+(function(){
+      // reveal blocks as they scroll into view (same mechanism as tinta.html)
+      if(!('IntersectionObserver' in window)) return;
+      var items = Array.prototype.slice.call(document.querySelectorAll('.scroll-in'));
+      var io = new IntersectionObserver(function(entries){
+        entries.forEach(function(entry){
+          entry.target.classList.toggle('is-visible', entry.isIntersecting);
+        });
+      },{threshold:0.12});
+      items.forEach(function(it){ io.observe(it); });
+    })();
+
+    (function(){
+      if(!window.matchMedia('(hover:hover) and (pointer:fine)').matches) return;
+      var dotCursor=document.querySelector('.cursor-dot');
+      if(!dotCursor) return;
+      document.body.classList.add('has-custom-cursor');
+      function place(x,y){dotCursor.style.transform='translate('+x+'px,'+y+'px) translate(-50%,-50%)';}
+      function updateColor(target){
+        var inDark = target.closest('footer.site-footer, .hero-full');
+        dotCursor.classList.toggle('white', !!inDark);
+      }
+      place(window.innerWidth/2,window.innerHeight/2);
+      document.addEventListener('mousemove',function(e){
+        place(e.clientX,e.clientY);
+        updateColor(e.target);
+      });
+      document.querySelectorAll('a').forEach(function(el){
+        el.addEventListener('mouseenter',function(){dotCursor.classList.add('is-link');updateColor(el);});
+        el.addEventListener('mouseleave',function(){dotCursor.classList.remove('is-link');});
+      });
+      document.addEventListener('mouseleave',function(){dotCursor.style.opacity='0';});
+      document.addEventListener('mouseenter',function(){dotCursor.style.opacity='1';});
+    })();
+
+    (function(){
+      // mobile menu toggle: close when link clicked or Esc pressed
+      var cb=document.getElementById('navToggle'), m=document.querySelector('.mobile-menu');
+      if(!cb||!m) return;
+      m.querySelectorAll('a').forEach(function(a){a.addEventListener('click',function(){cb.checked=false;});});
+      document.addEventListener('keydown',function(e){if(e.key==='Escape')cb.checked=false;});
+    })();
+
+    (function(){
+      // sync .open class with checkbox so hamburger becomes X reliably
+      var cb=document.getElementById('navToggle'), toggle=document.querySelector('.menu-toggle'), m=document.querySelector('.mobile-menu');
+      if(!cb||!toggle) return;
+      function sync(){ if(cb.checked) toggle.classList.add('open'); else toggle.classList.remove('open'); }
+      cb.addEventListener('change', sync);
+      toggle.addEventListener('click', function(){ setTimeout(sync, 10); });
+      if(m) m.querySelectorAll('a').forEach(function(a){ a.addEventListener('click', function(){ cb.checked=false; sync(); }); });
+    })();
+
+    (function(){
+      // back to top: shows once you've scrolled down a bit
+      var btn=document.querySelector('.to-top');
+      if(!btn) return;
+      function toggle(){ btn.classList.toggle('is-visible', window.scrollY > 400); }
+      toggle();
+      window.addEventListener('scroll', toggle);
+      btn.addEventListener('click', function(){
+        window.scrollTo({top:0, behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'});
+      });
+    })();
+  </script>
+</body>
+</html>

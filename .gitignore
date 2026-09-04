@@ -1,0 +1,25 @@
+# OS
+.DS_Store
+
+# local tool settings (not project code)
+.claude/
+
+# Raw / unprocessed source dumps — not used by the live pages, kept locally only
+viaje cósmico/
+tinta-source/
+Serie fotografica (VLA) 01/
+Tipografías/
+kairo/originals/
+offset/img_offset/
+
+# Unreferenced legacy/raw files left loose in project folders
+kairo/individual.jpg
+kairo/individual2.jpg
+offset/triologia2.png
+offset/positioning+guide.png
+offset/mobile+desktop.png
+offset/Offsetabajocataogo.png
+offset/finalnueva.png
+offset/pattern.png
+offset/logo.jpg
+offset/instagram-phone.png

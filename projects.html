@@ -1,0 +1,442 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Projects — Delfina Contini</title>
+  <link rel="icon" type="image/svg+xml" href="img/favicon.svg">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    :root{
+      --bg:#fff;--ink:#111;--line:rgba(17,17,17,.15);--pad:clamp(1.2rem,3vw,3rem);
+      /* same vertical rhythm system as about.html */
+      --space-top:clamp(90px,18vw,140px);
+      --space-section:clamp(2.75rem,6vw,4.5rem);
+      --space-tight:clamp(1rem,2.5vw,1.75rem);
+    }
+    html,body{background:var(--bg);color:var(--ink);font-family:'DM Mono',monospace;margin:0}
+    /* NAV (same as about.html) */
+    .topbar{position:fixed;left:0;right:0;top:0;background:var(--bg);border-bottom:none;z-index:1110}
+    .topbar .container{width:100%;margin:0 auto;padding:28px calc(var(--pad) + 0.25rem);display:flex;align-items:center;justify-content:flex-end;gap:60px;position:relative}
+    .nav-logo{position:absolute;left:calc(var(--pad) + 0.25rem);top:50%;transform:translateY(-50%);display:flex;align-items:center;color:#111}
+    .nav-logo svg{height:40px;width:auto;display:block}
+    .nav-links{display:flex;gap:24px;align-items:center;justify-content:flex-end;flex-wrap:nowrap;white-space:nowrap}
+    .nav-links a{position:relative;display:inline-flex;align-items:center;font-family:'DM Mono',monospace;font-size:14px;letter-spacing:.28em;text-transform:uppercase;text-decoration:none;color:var(--ink);transition:color .2s ease}
+    .nav-links a::after{content:'';position:absolute;left:0;bottom:-2px;width:0;height:1px;background:var(--ink);transition:width .3s cubic-bezier(.22,1,.36,1)}
+    .nav-links a:hover::after,.nav-links a:focus-visible::after{width:100%}
+    .nav-links a.active::after{width:100%}
+    .nav-links .sep{width:1px;height:12px;background:var(--line);display:inline-block}
+
+    /* page container */
+    main{max-width:1200px;margin:var(--space-top) auto 0;padding:0 var(--pad)}
+    .nav-checkbox:checked ~ .topbar .menu-toggle span:nth-child(1){transform:translateY(8.5px) rotate(45deg)}
+    .nav-checkbox:checked ~ .topbar .menu-toggle span:nth-child(2){opacity:0}
+    .nav-checkbox:checked ~ .topbar .menu-toggle span:nth-child(3){transform:translateY(-8.5px) rotate(-45deg)}
+
+    /* PAGE TITLE */
+    .projects-hero{padding-top:10px;padding-bottom:var(--space-tight)}
+    .pretitle{font-family:'DM Mono',monospace;font-size:13px;letter-spacing:.2em;text-transform:uppercase;margin-bottom:8px}
+    .page-title{font-family:'Switzer',sans-serif;font-weight:700;font-size:clamp(2.4rem,6vw,4rem);line-height:.95;text-transform:uppercase;margin:0 0 28px}
+
+    /* CATEGORY FILTER */
+    .filters{display:flex;flex-wrap:wrap;gap:24px;padding-bottom:var(--space-tight)}
+    .filter-btn{font-family:'DM Mono',monospace;font-size:12px;letter-spacing:.14em;text-transform:uppercase;background:none;border:none;padding:4px 0;margin:0;color:var(--ink);opacity:.5;cursor:pointer;position:relative;transition:opacity .2s ease}
+    .filter-btn::after{content:'';position:absolute;left:0;bottom:0;width:0;height:1px;background:var(--ink);transition:width .3s cubic-bezier(.22,1,.36,1)}
+    .filter-btn:hover{opacity:.8}
+    .filter-btn.is-active{opacity:1}
+    .filter-btn.is-active::after{width:100%}
+    .filters .sep{width:1px;height:12px;background:var(--line);display:inline-block;align-self:center}
+    .filter-empty{font-family:'DM Mono',monospace;font-size:13px;opacity:.55;padding-bottom:var(--space-section)}
+
+    /* mobile: dropdown instead of the button row */
+    .filter-select-wrap{display:none}
+
+    /* PROJECTS GRID */
+    .projects-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:40px;padding-bottom:var(--space-section)}
+    .project-card{display:block;text-decoration:none;color:var(--ink);opacity:0;transform:translateY(1.5rem);transition:opacity .75s cubic-bezier(.22,1,.36,1),transform .75s cubic-bezier(.22,1,.36,1);transition-delay:calc(var(--i,0) * .08s);will-change:opacity,transform}
+    .project-card.is-visible{opacity:1;transform:none}
+    .project-cover{position:relative;overflow:hidden;width:100%;aspect-ratio:4/5;background:#eee;transition:opacity .3s ease}
+    .project-card:hover .project-cover,.project-card:focus-visible .project-cover{opacity:.8}
+    .project-card:hover .project-cover.has-slideshow,.project-card:focus-visible .project-cover.has-slideshow{opacity:1}
+    .project-cover.has-slideshow img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;opacity:0;transition:opacity .25s ease}
+    .project-cover.has-slideshow img.is-active{opacity:1}
+    .project-cover.has-video video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+    .project-meta{padding-top:16px;display:flex;align-items:baseline;justify-content:space-between;gap:12px}
+    .project-title{font-family:'Switzer',sans-serif;font-weight:700;font-size:20px;text-transform:uppercase;margin:0}
+    .project-title::after{content:'↗';display:inline-block;margin-left:.3em;font-family:'DM Mono',monospace;font-weight:400;font-size:.9em;transform:translate(0,0);transition:transform .3s cubic-bezier(.22,1,.36,1)}
+    .project-card:hover .project-title,.project-card:focus-visible .project-title{text-decoration:underline;text-underline-offset:4px}
+    .project-card:hover .project-title::after,.project-card:focus-visible .project-title::after{transform:translate(3px,-3px)}
+    .project-tag{font-family:'DM Mono',monospace;font-size:12px;letter-spacing:.12em;text-transform:uppercase;opacity:.55;white-space:nowrap}
+
+    .cursor-dot.white{background:#fff;border-color:#fff}
+    .cursor-dot.white.is-link{background:transparent}
+
+    /* footer (same as about.html) */
+    footer.site-footer{background:#111;color:#fff;padding:64px var(--pad);margin-top:var(--space-section)}
+    .footer-inner{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr 1fr;align-items:center}
+    .footer-left a{font-family:'DM Mono',monospace;color:#fff;text-decoration:none;font-size:15px;letter-spacing:.18em;transition:text-decoration .15s ease;text-underline-offset:3px}
+    .footer-left a:hover,.footer-left a:focus-visible{text-decoration:underline}
+    .footer-center{text-align:center;position:relative;min-height:140px}
+    .footer-center::before{content:'';position:absolute;left:50%;top:54%;transform:translate(-50%,-50%);width:520px;height:180px;background-image:url('img/firma.png');background-size:contain;background-repeat:no-repeat;background-position:center center;opacity:.52;pointer-events:none}
+    .footer-center .name{font-family:Switzer, 'Switzer', sans-serif;font-weight:700;font-size:56px;line-height:0.9;letter-spacing:.02em;color:#fff;position:relative;z-index:2}
+    .footer-center .sub{font-family:'DM Mono',monospace;font-size:13px;opacity:.9;color:#fff;position:relative;z-index:2;margin-top:8px}
+    .footer-right{display:flex;flex-direction:column;align-items:flex-end;gap:6px}
+    .footer-right a{color:#fff;font-family:'DM Mono',monospace;font-size:15px;text-decoration:none;display:inline-flex;align-items:center;gap:.4em;transition:color .25s ease}
+    .footer-right a::after{content:'↗';display:inline-block;transform:translate(0,0);transition:transform .3s cubic-bezier(.22,1,.36,1)}
+    .footer-right a:hover::after,.footer-right a:focus-visible::after{transform:translate(3px,-3px)}
+
+    @media (prefers-reduced-motion:reduce){
+      .project-card{opacity:1;transform:none;transition:none}
+    }
+
+    /* right fixed progress line */
+    .right-line{position:fixed;right:14px;top:0;bottom:0;width:1px;background:var(--line);z-index:900}
+    .right-line .dot{position:fixed;right:10px;width:8px;height:8px;background:#111;border-radius:50%;transform:translateY(0);transition:transform .25s ease}
+
+    /* responsive */
+    @media (max-width:920px){
+      .projects-grid{grid-template-columns:repeat(2,1fr);gap:28px}
+    }
+
+    @media (max-width:600px){
+      .topbar .nav-links{display:none}
+      .topbar .container{padding-top:36px;padding-bottom:36px}
+      .menu-toggle{position:absolute;top:50%;right:calc(var(--pad) + 0.25rem);transform:translateY(-50%)}
+      .page-title{font-size:clamp(2.1rem,10vw,2.7rem)}
+      .filters{display:none}
+      .filter-select-wrap{display:block;position:relative;margin-bottom:var(--space-tight)}
+      .filter-select{width:100%;appearance:none;-webkit-appearance:none;-moz-appearance:none;background:var(--bg);border:1px solid var(--line);border-radius:0;padding:12px 36px 12px 14px;font-family:'DM Mono',monospace;font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink);cursor:pointer}
+      .filter-select-wrap::after{content:'';position:absolute;right:16px;top:50%;width:7px;height:7px;border-right:1.5px solid var(--ink);border-bottom:1.5px solid var(--ink);transform:translate(0,-50%) rotate(45deg);pointer-events:none}
+      .projects-grid{grid-template-columns:1fr;gap:2.5rem}
+      footer.site-footer{padding:48px 1.2rem}
+      .footer-inner{display:flex;flex-direction:column;align-items:center;gap:18px;text-align:center}
+      .footer-left,.footer-center,.footer-right{width:100%}
+      .footer-right{flex-direction:row;justify-content:center;align-items:center;flex-wrap:wrap;gap:10px;order:3}
+      .footer-left{order:1}
+      .footer-center{order:2;min-height:220px;position:relative;padding-top:24px}
+      .footer-left a,.footer-right a{font-size:13px;letter-spacing:.16em}
+      .footer-center::before{display:block;opacity:.45;top:44%;left:50%;transform:translate(-50%,-50%);width:320px;height:120px}
+    }
+  </style>
+</head>
+<body>
+  <input type="checkbox" id="navToggle" class="nav-checkbox" aria-hidden="true" tabindex="-1">
+
+  <header class="topbar">
+    <div class="container">
+      <a class="nav-logo" href="index.html" aria-label="Home">
+        <svg viewBox="0 0 48 42" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M14.5477 4.14182C14.0694 3.76354 12.38 2.65353 10.8429 2.06797C9.70813 1.63565 8.21659 2.02297 7.09017 2.82459C5.40107 4.02664 4.70456 6.35089 3.74787 8.89742C3.09802 10.6272 2.37964 13.3392 1.7778 16.5688C1.17597 19.7984 0.780238 23.4873 0.592293 25.8371C0.332992 29.079 0.654361 30.9456 1.12999 32.8289C1.62068 34.7719 2.66458 36.4165 3.64028 37.8291C4.59182 39.2066 5.96069 40.1141 7.19919 40.8257C8.30436 41.4607 9.60536 41.5046 10.8737 41.5C12.1891 41.4952 13.6607 40.4374 15.3796 38.7312C16.3524 37.7655 17.2322 36.319 18.1118 34.7573C18.9915 33.1957 19.7684 31.4916 20.6818 28.6981C21.5952 25.9047 22.6216 22.0733 23.3295 17.5185C24.0375 12.9637 24.396 7.80147 24.5462 4.88712C24.6965 1.97277 24.6276 1.46275 24.4895 0.869154C24.3513 0.275555 24.1459 -0.386164 24.3753 5.69495C24.6047 11.7761 25.2751 24.6201 24.4999 26.9172C23.7248 29.2143 21.4838 20.5753 20.2821 15.7907C19.0804 11.006 18.9859 10.3374 19.1337 9.885C19.4005 9.0678 22.48 8.19874 26.5392 6.93036C30.9327 5.55752 33.7608 6.18245 34.2996 6.36958C34.7454 6.52441 34.9683 7.2256 35.1982 8.30676C35.5163 9.80279 35.4795 12.1259 35.3394 15.0134C35.2677 16.4927 34.9537 17.9839 34.1862 20.1138C33.4188 22.2436 32.1459 24.9627 30.0394 28.3926C27.933 31.8225 25.0316 35.8808 23.533 37.887C22.0344 39.8932 22.0265 39.7242 22.1079 39.3837C22.1893 39.0432 22.3604 38.5363 24.6735 34.4556C26.9866 30.375 31.4366 22.7359 35.4914 16.6428C39.5463 10.5497 43.0713 6.23421 44.9881 3.91347C46.9049 1.59272 47.1067 1.39754 47.5 1.10879" stroke="black" stroke-linecap="round"/>
+        </svg>
+      </a>
+      <nav class="nav-links" aria-label="Main navigation">
+        <a href="projects.html" class="active">Projects</a>
+        <span class="sep" aria-hidden="true"></span>
+        <a href="about.html">About me</a>
+        <span class="sep" aria-hidden="true"></span>
+        <a href="contact.html">Contact me</a>
+      </nav>
+      <label class="menu-toggle" for="navToggle" role="button" aria-label="Toggle menu">
+        <span></span><span></span><span></span>
+      </label>
+    </div>
+  </header>
+
+  <main>
+    <section class="projects-hero reveal d1">
+      <div class="pretitle">WORK</div>
+      <h1 class="page-title">PROJECTS</h1>
+    </section>
+
+    <nav class="filters reveal d3" aria-label="Filter projects by category">
+      <button type="button" class="filter-btn is-active" data-filter="all">All</button>
+      <span class="sep" aria-hidden="true"></span>
+      <button type="button" class="filter-btn" data-filter="branding">Branding</button>
+      <span class="sep" aria-hidden="true"></span>
+      <button type="button" class="filter-btn" data-filter="web-design">Web Design</button>
+      <span class="sep" aria-hidden="true"></span>
+      <button type="button" class="filter-btn" data-filter="social-media">Social Media</button>
+      <span class="sep" aria-hidden="true"></span>
+      <button type="button" class="filter-btn" data-filter="photography">Photography</button>
+      <span class="sep" aria-hidden="true"></span>
+      <button type="button" class="filter-btn" data-filter="audiovisual">Audiovisual</button>
+      <span class="sep" aria-hidden="true"></span>
+      <button type="button" class="filter-btn" data-filter="editorial-design">Editorial Design</button>
+    </nav>
+
+    <div class="filter-select-wrap">
+      <select id="filterSelect" class="filter-select" aria-label="Filter projects by category">
+        <option value="all">All</option>
+        <option value="branding">Branding</option>
+        <option value="web-design">Web Design</option>
+        <option value="social-media">Social Media</option>
+        <option value="photography">Photography</option>
+        <option value="audiovisual">Audiovisual</option>
+        <option value="editorial-design">Editorial Design</option>
+      </select>
+    </div>
+
+    <p class="filter-empty" id="filterEmpty" hidden>Nothing here yet — check back soon.</p>
+
+    <section class="projects-grid">
+      <a class="project-card" href="offset.html" data-categories="branding social-media">
+        <div class="project-cover has-slideshow">
+          <img src="offset/hero-billboard.jpg" alt="" class="is-active">
+          <img src="offset/lens-spray.jpg" alt="">
+          <img src="offset/bags.jpg" alt="">
+          <img src="offset/concept-envelope.jpg" alt="">
+          <img src="offset/box-with-glasses.jpg" alt="">
+          <img src="offset/care-guide.jpg" alt="">
+          <img src="offset/collection-catalog.jpg" alt="">
+        </div>
+        <div class="project-meta">
+          <h2 class="project-title">Offset</h2>
+          <span class="project-tag">2026</span>
+        </div>
+      </a>
+      <!-- data-categories is empty until each project is tagged — e.g. data-categories="branding web-design" -->
+      <a class="project-card" href="kairo.html" data-categories="branding photography web-design social-media">
+        <div class="project-cover has-slideshow">
+          <img src="kairo/logopapel.jpg" alt="" class="is-active">
+          <img src="kairo/tarjeta.jpg" alt="">
+          <img src="kairo/fotoconcepto.jpg" alt="">
+          <img src="kairo/fotofinal.jpg" alt="">
+        </div>
+        <div class="project-meta">
+          <h2 class="project-title">Kairo</h2>
+          <span class="project-tag">2025</span>
+        </div>
+      </a>
+      <a class="project-card" href="tinta.html" data-categories="branding editorial-design web-design">
+        <div class="project-cover has-video">
+          <video src="tinta/herotinta.mp4" muted loop playsinline preload="metadata" aria-label="TINTA hero video"></video>
+        </div>
+        <div class="project-meta">
+          <h2 class="project-title">Tinta</h2>
+          <span class="project-tag">2025</span>
+        </div>
+      </a>
+      <a class="project-card" href="viaje-cosmico.html" data-categories="audiovisual">
+        <div class="project-cover has-slideshow">
+          <img src="viaje-cosmico/hero.jpg" alt="" class="is-active">
+          <img src="viaje-cosmico/fotoabout.jpg" alt="">
+        </div>
+        <div class="project-meta">
+          <h2 class="project-title">Viaje Cósmico</h2>
+          <span class="project-tag">2024</span>
+        </div>
+      </a>
+      <a class="project-card" href="baul-de-recuerdos.html" data-categories="editorial-design">
+        <div class="project-cover has-slideshow">
+          <img src="baul de recuerdos/hero/Contini Fanzine P8 1.png" alt="" class="is-active">
+          <img src="baul de recuerdos/hero/Contini Fanzine P2 1.png" alt="">
+          <img src="baul de recuerdos/hero/Contini Fanzine P4 1.png" alt="">
+        </div>
+        <div class="project-meta">
+          <h2 class="project-title">Baúl de Recuerdos</h2>
+          <span class="project-tag">2023</span>
+        </div>
+      </a>
+      <a class="project-card" href="eterna.html" data-categories="photography">
+        <div class="project-cover has-slideshow">
+          <img src="eterna/eterna-01.jpg" alt="" class="is-active">
+          <img src="eterna/eterna-02.jpg" alt="">
+          <img src="eterna/eterna-03.jpg" alt="">
+          <img src="eterna/eterna-04.jpg" alt="">
+          <img src="eterna/eterna-05.jpg" alt="">
+          <img src="eterna/eterna-06.jpg" alt="">
+          <img src="eterna/eterna-07.jpg" alt="">
+        </div>
+        <div class="project-meta">
+          <h2 class="project-title">Eterna</h2>
+          <span class="project-tag">2026</span>
+        </div>
+      </a>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-left"><a href="mailto:delfinacontini0@gmail.com">CONTACT ME</a></div>
+      <div class="footer-center"><div class="name">DELFINA<br>CONTINI</div><div class="sub">BS AS, ARGENTINA</div></div>
+      <div class="footer-right">
+        <a href="https://www.behance.net/delfinacontini1" target="_blank" rel="noopener">BEHANCE</a>
+        <a href="https://www.instagram.com/delfinacontini/" target="_blank" rel="noopener">INSTAGRAM</a>
+        <a href="https://www.linkedin.com/in/delfina-contini" target="_blank" rel="noopener">LINKED IN</a>
+      </div>
+    </div>
+  </footer>
+
+  <div class="right-line" aria-hidden="true"></div>
+  <div class="right-line">
+    <div class="dot" id="progressDot"></div>
+  </div>
+
+  <div class="cursor-dot" aria-hidden="true"></div>
+
+  <button type="button" class="to-top" aria-label="Back to top">
+    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M12 19V5M12 5L6 11M12 5L18 11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </button>
+
+  <nav class="mobile-menu" id="mobileMenu" aria-hidden="true" aria-label="Mobile navigation">
+    <a href="projects.html" class="active">Projects</a>
+    <a href="about.html">About me</a>
+    <a href="contact.html">Contact me</a>
+  </nav>
+
+  <script>
+    (function(){
+      var dot=document.getElementById('progressDot');
+      var line=document.querySelector('.right-line');
+      if(!dot||!line) return;
+      function update(){
+        var scrollTop=window.scrollY;
+        var docHeight=document.documentElement.scrollHeight - window.innerHeight;
+        var progress=docHeight>0? scrollTop/docHeight : 0;
+        var top= Math.max(40, 40 + progress*(window.innerHeight - 90));
+        dot.style.transform='translateY('+top+'px)';
+      }
+      update();window.addEventListener('scroll',update);window.addEventListener('resize',update);
+    })();
+
+    (function(){
+      // hover slideshow: cards with more than one photo in .project-cover cycle through them on hover, like a video
+      if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      var canHover=window.matchMedia('(hover:hover) and (pointer:fine)').matches;
+      document.querySelectorAll('.project-cover.has-slideshow').forEach(function(cover){
+        var imgs = Array.prototype.slice.call(cover.querySelectorAll('img'));
+        var card = cover.closest('.project-card');
+        if(imgs.length < 2 || !card) return;
+        var idx = 0, timer = null;
+        function show(i){ imgs.forEach(function(img,j){ img.classList.toggle('is-active', j===i); }); }
+        function start(){
+          if(timer) return;
+          timer = setInterval(function(){ idx = (idx+1) % imgs.length; show(idx); }, 800);
+        }
+        if(cover.classList.contains('is-autoplay')) start();
+        if(canHover){
+          card.addEventListener('mouseenter', function(){
+            start();
+          });
+          card.addEventListener('mouseleave', function(){
+            if(cover.classList.contains('is-autoplay')) return;
+            clearInterval(timer);
+            idx = 0;
+            show(0);
+          });
+        }
+      });
+    })();
+
+    (function(){
+      if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      document.querySelectorAll('.project-cover.has-video video').forEach(function(video){
+        var card=video.closest('.project-card');
+        if(!card) return;
+        video.playbackRate=0.7;
+        card.addEventListener('mouseenter',function(){ video.play(); });
+        card.addEventListener('mouseleave',function(){ video.pause(); video.currentTime=0; });
+      });
+    })();
+
+    (function(){
+      // category filter: buttons on desktop, dropdown on mobile, same logic for both
+      var btns = Array.prototype.slice.call(document.querySelectorAll('.filter-btn'));
+      var select = document.getElementById('filterSelect');
+      var cards = Array.prototype.slice.call(document.querySelectorAll('.project-card'));
+      var empty = document.getElementById('filterEmpty');
+      if(!cards.length) return;
+
+      function applyFilter(filter){
+        var visibleCount = 0;
+        cards.forEach(function(card){
+          var cats = (card.getAttribute('data-categories') || '').split(/\s+/);
+          var show = filter === 'all' || cats.indexOf(filter) !== -1;
+          card.style.display = show ? '' : 'none';
+          if(show) visibleCount++;
+        });
+        if(empty) empty.hidden = visibleCount > 0;
+        btns.forEach(function(b){ b.classList.toggle('is-active', b.getAttribute('data-filter') === filter); });
+        if(select) select.value = filter;
+      }
+
+      btns.forEach(function(btn){
+        btn.addEventListener('click', function(){ applyFilter(btn.getAttribute('data-filter')); });
+      });
+      if(select){
+        select.addEventListener('change', function(){ applyFilter(select.value); });
+      }
+    })();
+
+    (function(){
+      // reveal project cards when scrolled into view, with stagger
+      if(!('IntersectionObserver' in window)) return;
+      function revealOnScroll(selector){
+        var items = Array.prototype.slice.call(document.querySelectorAll(selector));
+        if(!items.length) return;
+        items.forEach(function(el,i){ el.style.setProperty('--i', i); });
+        var io = new IntersectionObserver(function(entries){
+          entries.forEach(function(entry){
+            entry.target.classList.toggle('is-visible', entry.isIntersecting);
+          });
+        },{threshold:0.15});
+        items.forEach(function(it){ io.observe(it); });
+      }
+      revealOnScroll('.project-card');
+    })();
+
+    (function(){
+      if(!window.matchMedia('(hover:hover) and (pointer:fine)').matches) return;
+      var dotCursor=document.querySelector('.cursor-dot');
+      if(!dotCursor) return;
+      document.body.classList.add('has-custom-cursor');
+      function place(x,y){dotCursor.style.transform='translate('+x+'px,'+y+'px) translate(-50%,-50%)';}
+      function updateColor(target){
+        var inDark = target.closest('footer.site-footer');
+        dotCursor.classList.toggle('white', !!inDark);
+      }
+      place(window.innerWidth/2,window.innerHeight/2);
+      document.addEventListener('mousemove',function(e){
+        place(e.clientX,e.clientY);
+        updateColor(e.target);
+      });
+      document.querySelectorAll('a').forEach(function(el){
+        el.addEventListener('mouseenter',function(){dotCursor.classList.add('is-link');updateColor(el);});
+        el.addEventListener('mouseleave',function(){dotCursor.classList.remove('is-link');});
+      });
+      document.addEventListener('mouseleave',function(){dotCursor.style.opacity='0';});
+      document.addEventListener('mouseenter',function(){dotCursor.style.opacity='1';});
+    })();
+
+    (function(){
+      // mobile menu toggle: close when link clicked or Esc pressed
+      var cb=document.getElementById('navToggle'), m=document.querySelector('.mobile-menu');
+      if(!cb||!m) return;
+      m.querySelectorAll('a').forEach(function(a){a.addEventListener('click',function(){cb.checked=false;});});
+      document.addEventListener('keydown',function(e){if(e.key==='Escape')cb.checked=false;});
+    })();
+
+    (function(){
+      // sync .open class with checkbox so hamburger becomes X reliably
+      var cb=document.getElementById('navToggle'), toggle=document.querySelector('.menu-toggle'), m=document.querySelector('.mobile-menu');
+      if(!cb||!toggle) return;
+      function sync(){ if(cb.checked) toggle.classList.add('open'); else toggle.classList.remove('open'); }
+      cb.addEventListener('change', sync);
+      toggle.addEventListener('click', function(){ setTimeout(sync, 10); });
+      if(m) m.querySelectorAll('a').forEach(function(a){ a.addEventListener('click', function(){ cb.checked=false; sync(); }); });
+    })();
+
+    (function(){
+      // back to top: shows once you've scrolled down a bit
+      var btn=document.querySelector('.to-top');
+      if(!btn) return;
+      function toggle(){ btn.classList.toggle('is-visible', window.scrollY > 400); }
+      toggle();
+      window.addEventListener('scroll', toggle);
+      btn.addEventListener('click', function(){
+        window.scrollTo({top:0, behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'});
+      });
+    })();
+  </script>
+</body>
+</html>

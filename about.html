@@ -1,0 +1,455 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>About — Delfina Contini</title>
+  <link rel="icon" type="image/svg+xml" href="img/favicon.svg">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    :root{
+      --bg:#fff;--ink:#111;--line:rgba(17,17,17,.15);--pad:clamp(1.2rem,3vw,3rem);
+      /* vertical rhythm system: same 3 tokens used everywhere a section ends/begins, fluid across breakpoints */
+      --space-top:clamp(90px,18vw,140px);       /* page offset below the fixed header */
+      --space-section:clamp(2.75rem,6vw,4.5rem); /* standard gap between major blocks (~44–72px) */
+      --space-tight:clamp(1rem,2.5vw,1.75rem);   /* deliberately close pairings (~16–28px) */
+    }
+    html,body{background:var(--bg);color:var(--ink);font-family:'DM Mono',monospace;margin:0}
+    /* NAV */
+    .topbar{position:fixed;left:0;right:0;top:0;background:var(--bg);border-bottom:none;z-index:1110}
+    .topbar .container{width:100%;margin:0 auto;padding:28px calc(var(--pad) + 0.25rem);display:flex;align-items:center;justify-content:flex-end;gap:60px;position:relative}
+    .nav-logo{position:absolute;left:calc(var(--pad) + 0.25rem);top:50%;transform:translateY(-50%);display:flex;align-items:center;color:#111}
+    .nav-logo svg{height:40px;width:auto;display:block}
+    .nav-logo .base-path{stroke:#111;fill:none;stroke-width:2}
+    .nav-logo .anim-path{stroke:#111;fill:none;stroke-width:2;stroke-dasharray:320;stroke-dashoffset:320;transition:stroke-dashoffset .9s cubic-bezier(.45,0,.2,1)}
+    .nav-logo:hover .anim-path,.nav-logo:focus-visible .anim-path{stroke-dashoffset:0}
+    .nav-links{display:flex;gap:24px;align-items:center;justify-content:flex-end;flex-wrap:nowrap;white-space:nowrap}
+    /* hide header nav links on About page (only on small screens via media query) */
+    .nav-links a{position:relative;display:inline-flex;align-items:center;font-family:'DM Mono',monospace;font-size:14px;letter-spacing:.28em;text-transform:uppercase;text-decoration:none;color:var(--ink);transition:color .2s ease}
+    .nav-links a::after{content:'';position:absolute;left:0;bottom:-2px;width:0;height:1px;background:var(--ink);transition:width .3s cubic-bezier(.22,1,.36,1)}
+    .nav-links a:hover::after,.nav-links a:focus-visible::after{width:100%}
+    .nav-links a.active::after{width:100%}
+    .nav-links .sep{width:1px;height:12px;background:var(--line);display:inline-block}
+
+    /* page container */
+    main{max-width:1200px;margin:var(--space-top) auto 0;padding:0 var(--pad)}
+      /* mobile menu toggle (page-specific) */
+      .nav-checkbox:checked ~ .topbar .menu-toggle span:nth-child(1){transform:translateY(8.5px) rotate(45deg)}
+      .nav-checkbox:checked ~ .topbar .menu-toggle span:nth-child(2){opacity:0}
+      .nav-checkbox:checked ~ .topbar .menu-toggle span:nth-child(3){transform:translateY(-8.5px) rotate(-45deg)}
+
+    /* HERO */
+    .hero{display:grid;grid-template-columns:1fr 520px;gap:56px;align-items:start;padding-top:10px;padding-bottom:var(--space-section)}
+    .hero-left{max-width:44ch;justify-self:start;width:100%}
+    .pretitle{font-family:'DM Mono',monospace;font-size:13px;letter-spacing:.2em;text-transform:uppercase;margin-bottom:8px}
+    .hero-title{font-family:'Switzer',sans-serif;font-weight:700;font-size:clamp(2.4rem,6vw,4rem);line-height:.95;text-transform:uppercase;margin:0 0 28px}
+    .lead{font-family:'Switzer',sans-serif;font-size:16px;max-width:360px;line-height:1.6;margin-bottom:32px}
+    .years{display:flex;justify-content:space-between;font-family:'DM Mono',monospace;font-size:13px;margin-bottom:12px}
+    .location{font-family:'Switzer',sans-serif;font-weight:700;font-size:16px;text-transform:uppercase;margin-bottom:18px}
+    .lead-2{font-family:'Switzer',sans-serif;font-size:16px;max-width:56ch;line-height:1.7}
+
+    .hero-right{display:flex;flex-direction:column;align-items:flex-end;gap:12px}
+    .portrait{width:480px;height:480px;object-fit:cover;background:#eee}
+    .email{font-family:'DM Mono',monospace;font-size:11px;color:#111;text-decoration:none}
+    .email:hover,.email:focus{color:#111;text-decoration:underline;text-underline-offset:3px}
+
+    /* TIMELINE grid (education + experience reuse same styles) */
+    .section{padding-top:var(--space-section);padding-bottom:var(--space-section)}
+    .section h2{font-family:'Switzer',sans-serif;font-weight:700;font-size:14px;text-transform:uppercase;margin:0 0 32px}
+
+    .timeline{display:grid;grid-template-columns:repeat(4,1fr);gap:28px;align-items:end;position:relative;padding-bottom:40px}
+    .timeline.three-col{grid-template-columns:repeat(3,1fr)}
+    .timeline.five-col{grid-template-columns:repeat(5,1fr)}
+    /* equal-height items so the vertical divider lines all match, regardless of how much each entry's text wraps */
+    .timeline.five-col .titem{min-height:130px}
+    .timeline .titem{padding:16px 24px 16px 0;align-self:start;border-right:1px solid var(--line);opacity:0;transform:translateY(2rem);transition:opacity .75s cubic-bezier(.22,1,.36,1),transform .75s cubic-bezier(.22,1,.36,1);transition-delay:calc(var(--i,0) * 0.08s);will-change:opacity,transform}
+    .timeline .titem.is-visible{opacity:1;transform:none}
+    .timeline .titem .place{font-family:'Switzer',sans-serif;font-size:16px;margin:0 0 8px}
+    .timeline .titem .dates{font-family:'DM Mono',monospace;font-size:13px;opacity:.9;margin:0}
+    .timeline .titem:nth-child(1){grid-column:1;grid-row:1 / -1}
+    .timeline .titem:nth-child(2){grid-column:2;grid-row:2 / -1}
+    .timeline .titem:nth-child(3){grid-column:3;grid-row:3 / -1}
+    .timeline .titem:nth-child(4){grid-column:4;grid-row:4 / -1}
+    .timeline.five-col .titem:nth-child(5){grid-column:5;grid-row:5 / -1}
+    .timeline .titem:last-child{border-right:none}
+
+    /* full-bleed strip */
+    .strip{width:100vw;margin-left:calc(50% - 50vw);height:360px;display:grid;grid-template-columns:1fr 1fr 1fr;margin-bottom:var(--space-tight)}
+    .strip img{width:100%;height:360px;object-fit:cover;display:block}
+
+    /* words row */
+    .words{display:grid;grid-template-columns:1fr 1fr 1fr;padding-top:var(--space-tight);padding-bottom:var(--space-tight);text-align:center;align-items:center;gap:16px;justify-items:center}
+    .word-wrap{position:relative;display:flex;align-items:center;justify-content:center;width:280px;height:280px}
+    .word-wrap .word{font-family:'DM Mono',monospace;font-size:14px;letter-spacing:.18em;text-transform:uppercase;cursor:pointer;line-height:1;z-index:2;position:relative}
+    .word-wrap .word[tabindex]{padding:6px}
+    .word-wrap img{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) scale(.96);max-width:220px;height:auto;opacity:0;visibility:hidden;transition:opacity .22s ease,transform .22s ease;z-index:1}
+    .word-wrap:hover .word,.word-wrap:focus-within .word{opacity:0;visibility:hidden}
+    .word-wrap:hover img,.word-wrap:focus-within img{opacity:1;visibility:visible;transform:translate(-50%,-50%) scale(1.18);z-index:3}
+    .words-caption{display:none}
+
+    .cursor-dot.white{background:#fff;border-color:#fff}
+    .cursor-dot.white.is-link{background:transparent}
+
+    /* footer */
+    footer.site-footer{background:#111;color:#fff;padding:64px var(--pad);margin-top:var(--space-tight)}
+    .footer-inner{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr 1fr;align-items:center}
+    .footer-left a{font-family:'DM Mono',monospace;color:#fff;text-decoration:none;font-size:15px;letter-spacing:.18em;transition:text-decoration .15s ease;text-underline-offset:3px}
+    .footer-left a:hover,.footer-left a:focus-visible{text-decoration:underline}
+    .footer-center{text-align:center;position:relative;min-height:140px}
+    .footer-center::before{content:'';position:absolute;left:50%;top:54%;transform:translate(-50%,-50%);width:520px;height:180px;background-image:url('img/firma.png');background-size:contain;background-repeat:no-repeat;background-position:center center;opacity:.52;pointer-events:none}
+    .footer-center .name{font-family:Switzer, 'Switzer', sans-serif;font-weight:700;font-size:56px;line-height:0.9;letter-spacing:.02em;color:#fff;position:relative;z-index:2}
+    .footer-center .sub{font-family:'DM Mono',monospace;font-size:13px;opacity:.9;color:#fff;position:relative;z-index:2;margin-top:8px}
+    .footer-right{display:flex;flex-direction:column;align-items:flex-end;gap:6px}
+    .footer-right a{color:#fff;font-family:'DM Mono',monospace;font-size:15px;text-decoration:none;display:inline-flex;align-items:center;gap:.4em;transition:color .25s ease}
+    .footer-right a::after{content:'↗';display:inline-block;transform:translate(0,0);transition:transform .3s cubic-bezier(.22,1,.36,1)}
+    .footer-right a:hover::after,.footer-right a:focus-visible::after{transform:translate(3px,-3px)}
+
+    /* TOOLS marquee */
+    .tools-marquee{width:100vw;margin-left:calc(50% - 50vw);overflow:hidden;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:12px 0}
+    .tools-marquee + main{margin-top:var(--space-section)}
+    .tools-track{display:flex;width:max-content;animation:tools-scroll 130s linear infinite}
+    .tools-set{display:flex;align-items:center;flex-shrink:0}
+    .tools-set .tool{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;white-space:nowrap;padding:0 16px}
+    .tools-set .sep{width:1px;height:9px;background:var(--line);display:inline-block}
+    @keyframes tools-scroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+    /* WORDS reveal on scroll */
+    .words .word-wrap{opacity:0;transform:translateY(1.4rem);transition:opacity .75s cubic-bezier(.22,1,.36,1),transform .75s cubic-bezier(.22,1,.36,1);transition-delay:calc(var(--i,0) * .1s);will-change:opacity,transform}
+    .words .word-wrap.is-visible{opacity:1;transform:none}
+
+    @media (prefers-reduced-motion:reduce){
+      .tools-track{animation:none}
+      .words .word-wrap{opacity:1;transform:none;transition:none}
+      .timeline .titem{opacity:1;transform:none;transition:none}
+    }
+
+    /* right fixed progress line */
+    .right-line{position:fixed;right:14px;top:0;bottom:0;width:1px;background:var(--line);z-index:900}
+    .right-line .dot{position:fixed;right:10px;width:8px;height:8px;background:#111;border-radius:50%;transform:translateY(0);transition:transform .25s ease}
+
+    /* responsive */
+    @media (max-width:920px){
+      .hero{grid-template-columns:1fr;}
+      .hero-right{align-items:flex-start}
+      .portrait{width:100%;height:auto;aspect-ratio:1/1}
+      .timeline{grid-template-columns:1fr}
+      .timeline .titem{grid-column:1;grid-row:auto;border-right:none;padding-right:0;padding-left:6px}
+      .strip{grid-template-columns:1fr;height:auto}
+      .footer-right{align-items:flex-start}
+    }
+
+    @media (max-width:600px){
+      /* Reduce portrait and about photos slightly and ensure spacing */
+      /* hide header nav links on About page in small screens */
+      .topbar .nav-links{display:none}
+      /* align hamburger with the logo (same centering technique) and give the bar a touch more height */
+      .topbar .container{padding-top:36px;padding-bottom:36px}
+      .menu-toggle{position:absolute;top:50%;right:calc(var(--pad) + 0.25rem);transform:translateY(-50%)}
+      .hero-title{font-size:clamp(2.1rem,10vw,2.7rem)}
+      .hero{grid-template-columns:1fr;gap:2.4rem}
+      .hero-right{align-items:center}
+      .portrait{width:360px;height:auto;max-width:92vw;margin:0 auto 40px;display:block}
+      .hero-left{padding:0 1rem}
+      .hero-right{padding:0 1rem}
+      /* about page photo column */
+      .ab-photo{max-width:320px;margin:0 auto;aspect-ratio:1/1}
+      /* reduce strip images height to avoid overlap */
+      .strip img{height:200px;object-fit:cover}
+      /* TIMELINE: vertical list on small screens */
+      .timeline{display:block;padding-left:0}
+      .timeline .titem{display:block;border-right:none;border-left:1px solid var(--line);padding-left:14px;padding-right:0;margin-bottom:1.2rem}
+      .timeline .titem .place{margin-bottom:.3rem}
+      /* WORDS/photos: stacked images, no per-photo caption, no hover effect */
+      .words{display:flex;flex-direction:column;gap:4rem}
+      .word-wrap{position:relative;width:360px;max-width:92vw;margin:0 auto;display:flex;flex-direction:column;align-items:center}
+      .word-wrap img,
+      .word-wrap:hover img,.word-wrap:focus-within img,.word-wrap:active img{
+        position:static;width:100%;max-width:none;height:auto;aspect-ratio:1/1;object-fit:cover;
+        opacity:1;visibility:visible;transform:none;transition:none;z-index:auto
+      }
+      .word-wrap .word{display:none}
+      /* static on mobile: no scroll-reveal slide/fade either */
+      .words .word-wrap{opacity:1;transform:none;transition:none}
+      .words-caption{display:block;font-family:'Switzer',sans-serif;font-weight:700;font-size:clamp(1.05rem,5.5vw,1.4rem);text-transform:uppercase;letter-spacing:.02em;text-align:center;white-space:nowrap;margin-top:.6rem}
+      /* Footer mobile: keep stacked layout, show bigger signature */
+      footer.site-footer{padding:48px 1.2rem}
+      .footer-inner{display:flex;flex-direction:column;align-items:center;gap:18px;text-align:center}
+      .footer-left,.footer-center,.footer-right{width:100%}
+      .footer-right{flex-direction:row;justify-content:center;align-items:center;flex-wrap:wrap;gap:10px;order:3}
+      .footer-left{order:1}
+      .footer-center{order:2;min-height:220px;position:relative;padding-top:24px}
+      .footer-left a,.footer-right a{font-size:13px;letter-spacing:.16em}
+      .footer-center::before{display:block;opacity:.45;top:44%;left:50%;transform:translate(-50%,-50%);width:320px;height:120px}
+    }
+  </style>
+</head>
+<body>
+  <input type="checkbox" id="navToggle" class="nav-checkbox" aria-hidden="true" tabindex="-1">
+
+  <header class="topbar">
+    <div class="container">
+      <a class="nav-logo" href="index.html" aria-label="Home">
+        <svg viewBox="0 0 48 42" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M14.5477 4.14182C14.0694 3.76354 12.38 2.65353 10.8429 2.06797C9.70813 1.63565 8.21659 2.02297 7.09017 2.82459C5.40107 4.02664 4.70456 6.35089 3.74787 8.89742C3.09802 10.6272 2.37964 13.3392 1.7778 16.5688C1.17597 19.7984 0.780238 23.4873 0.592293 25.8371C0.332992 29.079 0.654361 30.9456 1.12999 32.8289C1.62068 34.7719 2.66458 36.4165 3.64028 37.8291C4.59182 39.2066 5.96069 40.1141 7.19919 40.8257C8.30436 41.4607 9.60536 41.5046 10.8737 41.5C12.1891 41.4952 13.6607 40.4374 15.3796 38.7312C16.3524 37.7655 17.2322 36.319 18.1118 34.7573C18.9915 33.1957 19.7684 31.4916 20.6818 28.6981C21.5952 25.9047 22.6216 22.0733 23.3295 17.5185C24.0375 12.9637 24.396 7.80147 24.5462 4.88712C24.6965 1.97277 24.6276 1.46275 24.4895 0.869154C24.3513 0.275555 24.1459 -0.386164 24.3753 5.69495C24.6047 11.7761 25.2751 24.6201 24.4999 26.9172C23.7248 29.2143 21.4838 20.5753 20.2821 15.7907C19.0804 11.006 18.9859 10.3374 19.1337 9.885C19.4005 9.0678 22.48 8.19874 26.5392 6.93036C30.9327 5.55752 33.7608 6.18245 34.2996 6.36958C34.7454 6.52441 34.9683 7.2256 35.1982 8.30676C35.5163 9.80279 35.4795 12.1259 35.3394 15.0134C35.2677 16.4927 34.9537 17.9839 34.1862 20.1138C33.4188 22.2436 32.1459 24.9627 30.0394 28.3926C27.933 31.8225 25.0316 35.8808 23.533 37.887C22.0344 39.8932 22.0265 39.7242 22.1079 39.3837C22.1893 39.0432 22.3604 38.5363 24.6735 34.4556C26.9866 30.375 31.4366 22.7359 35.4914 16.6428C39.5463 10.5497 43.0713 6.23421 44.9881 3.91347C46.9049 1.59272 47.1067 1.39754 47.5 1.10879" stroke="black" stroke-linecap="round"/>
+        </svg>
+      </a>
+      <nav class="nav-links" aria-label="Main navigation">
+        <a href="projects.html">Projects</a>
+        <span class="sep" aria-hidden="true"></span>
+        <a href="about.html" class="active">About me</a>
+        <span class="sep" aria-hidden="true"></span>
+        <a href="contact.html">Contact me</a>
+      </nav>
+      <label class="menu-toggle" for="navToggle" role="button" aria-label="Toggle menu">
+        <span></span><span></span><span></span>
+      </label>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="hero-left reveal d1">
+        <div class="pretitle">HELLO</div>
+        <h1 class="hero-title">I'M DELFINA CONTINI</h1>
+        <p class="lead">I've just graduated with a Bachelor's degree in Design, based in Buenos Aires. Ready to work and collaborate.</p>
+        <div class="years"><span>2004</span><span>2026</span></div>
+        <div class="location">BUENOS AIRES,<br>ARGENTINA</div>
+        <p class="lead-2">I am interested in the process of transforming ideas into innovative visual creations. I consider myself a creative, observant, and committed person, always willing to explore different perspectives to tackle any challenge.</p>
+      </div>
+        <div class="hero-right reveal d3">
+        <img class="portrait" src="aboutme/yo.png" alt="Portrait">
+        <a class="email" href="mailto:delfinacontini0@gmail.com">delfinacontini0@gmail.com</a>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>EDUCATION</h2>
+      <div class="timeline three-col">
+        <div class="titem">
+          <div class="place">St. Catherine's Moorlands School</div>
+          <div class="dates">2010  /  2021</div>
+        </div>
+        <div class="titem">
+          <div class="place">Exchange at Universidad Carlos III, Madrid</div>
+          <div class="dates">2025</div>
+        </div>
+        <div class="titem">
+          <div class="place">Bachelor's degree in Design, Torcuato Di Tella University</div>
+          <div class="dates">2022  /  2025</div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <div class="strip">
+    <img src="aboutme/textura1.png" alt="textura 1">
+    <img src="aboutme/textura2.png" alt="textura 2">
+    <img src="aboutme/textura3.png" alt="textura 3">
+  </div>
+
+  <div class="tools-marquee" aria-label="Tools I use">
+    <div class="tools-track">
+      <div class="tools-set">
+        <span class="tool">Illustrator</span><span class="sep" aria-hidden="true"></span>
+        <span class="tool">Photoshop</span><span class="sep" aria-hidden="true"></span>
+        <span class="tool">After Effects</span><span class="sep" aria-hidden="true"></span>
+        <span class="tool">Lightroom</span><span class="sep" aria-hidden="true"></span>
+        <span class="tool">InDesign</span><span class="sep" aria-hidden="true"></span>
+        <span class="tool">Rhinoceros 7</span><span class="sep" aria-hidden="true"></span>
+        <span class="tool">Keyshot</span><span class="sep" aria-hidden="true"></span>
+        <span class="tool">VS Code</span><span class="sep" aria-hidden="true"></span>
+        <span class="tool">Figma</span><span class="sep" aria-hidden="true"></span>
+      </div>
+      <div class="tools-set" aria-hidden="true">
+        <span class="tool">Illustrator</span><span class="sep"></span>
+        <span class="tool">Photoshop</span><span class="sep"></span>
+        <span class="tool">After Effects</span><span class="sep"></span>
+        <span class="tool">Lightroom</span><span class="sep"></span>
+        <span class="tool">InDesign</span><span class="sep"></span>
+        <span class="tool">Rhinoceros 7</span><span class="sep"></span>
+        <span class="tool">Keyshot</span><span class="sep"></span>
+        <span class="tool">VS Code</span><span class="sep"></span>
+        <span class="tool">Figma</span><span class="sep"></span>
+      </div>
+    </div>
+  </div>
+
+  <main>
+    <section class="section">
+      <h2>EXPERIENCE</h2>
+      <div class="timeline five-col">
+        <div class="titem">
+          <div class="place">Branding and administration for Coco Bakery, my entrepreneurship.</div>
+          <div class="dates">FEB. 2021  /  DIC. 2021</div>
+        </div>
+        <div class="titem">
+          <div class="place">Support Staff at Vail Resorts, Colorado, EEUU</div>
+          <div class="dates">DIC. 2023  /  MAR. 2024</div>
+        </div>
+        <div class="titem">
+          <div class="place">Graphic Designer at MP Workplaces, Buenos Aires</div>
+          <div class="dates">SEPT. 2024  /  DIC. 2024</div>
+        </div>
+        <div class="titem">
+          <div class="place">Graphic Designer at Bo Project, Buenos Aires</div>
+          <div class="dates">SEPT. 2025  /  DIC. 2025</div>
+        </div>
+        <div class="titem">
+          <div class="place">Designer at Liberarte Creative Studio</div>
+          <div class="dates">MAR. 2026  /  NOW</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="words">
+      <div class="word-wrap">
+        <span class="word" tabindex="0">EXPLORE</span>
+        <img src="aboutme/explore.png" alt="Explore image">
+      </div>
+      <div class="word-wrap">
+        <span class="word" tabindex="0">CONNECT</span>
+        <img src="aboutme/connect.png" alt="Connect image">
+      </div>
+      <div class="word-wrap">
+        <span class="word" tabindex="0">CREATE</span>
+        <img src="aboutme/create.png" alt="Create image">
+      </div>
+      <div class="words-caption">Explore, Connect &amp; Create</div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-left"><a href="mailto:delfinacontini0@gmail.com">CONTACT ME</a></div>
+      <div class="footer-center"><div class="name">DELFINA<br>CONTINI</div><div class="sub">BS AS, ARGENTINA</div></div>
+      <div class="footer-right">
+        <a href="https://www.behance.net/delfinacontini1" target="_blank" rel="noopener">BEHANCE</a>
+        <a href="https://www.instagram.com/delfinacontini/" target="_blank" rel="noopener">INSTAGRAM</a>
+        <a href="https://www.linkedin.com/in/delfina-contini" target="_blank" rel="noopener">LINKED IN</a>
+      </div>
+    </div>
+  </footer>
+
+  <div class="right-line" aria-hidden="true"></div>
+  <div class="right-line">
+    <div class="dot" id="progressDot"></div>
+  </div>
+
+  <div class="cursor-dot" aria-hidden="true"></div>
+
+  <button type="button" class="to-top" aria-label="Back to top">
+    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M12 19V5M12 5L6 11M12 5L18 11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </button>
+
+  <nav class="mobile-menu" id="mobileMenu" aria-hidden="true" aria-label="Mobile navigation">
+    <a href="projects.html">Projects</a>
+    <a href="about.html" class="active">About me</a>
+    <a href="contact.html">Contact me</a>
+  </nav>
+
+  <script>
+    (function(){
+      // duplicate each half of the tools ticker enough times so it's always wider
+      // than the viewport, no matter the screen — otherwise on wide desktop screens
+      // the content runs out before the loop point and it looks like it stops.
+      var track = document.querySelector('.tools-track');
+      if(!track) return;
+      var sets = track.querySelectorAll('.tools-set');
+      var REPEATS = 5;
+      sets.forEach(function(set){
+        var original = set.innerHTML;
+        for(var i=1;i<REPEATS;i++){ set.insertAdjacentHTML('beforeend', original); }
+      });
+    })();
+
+    (function(){
+      var dot=document.getElementById('progressDot');
+      var line=document.querySelector('.right-line');
+      if(!dot||!line) return;
+      function update(){
+        var scrollTop=window.scrollY;
+        var docHeight=document.documentElement.scrollHeight - window.innerHeight;
+        var progress=docHeight>0? scrollTop/docHeight : 0;
+        var top= Math.max(40, 40 + progress*(window.innerHeight - 90));
+        dot.style.transform='translateY('+top+'px)';
+      }
+      update();window.addEventListener('scroll',update);window.addEventListener('resize',update);
+    })();
+
+    (function(){
+      // reveal elements when scrolled into view, with stagger (timeline items + tool words)
+      if(!('IntersectionObserver' in window)) return;
+      function revealOnScroll(selector){
+        var items = Array.prototype.slice.call(document.querySelectorAll(selector));
+        if(!items.length) return;
+        // assign index for transition staggering
+        items.forEach(function(el,i){ el.style.setProperty('--i', i); });
+        var io = new IntersectionObserver(function(entries){
+          entries.forEach(function(entry){
+            // toggle (not just add) so it replays every time it re-enters view,
+            // e.g. scrolling back up and down again
+            entry.target.classList.toggle('is-visible', entry.isIntersecting);
+          });
+        },{threshold:0.15});
+        items.forEach(function(it){ io.observe(it); });
+      }
+      revealOnScroll('.timeline .titem');
+      revealOnScroll('.words .word-wrap');
+    })();
+
+    (function(){
+      if(!window.matchMedia('(hover:hover) and (pointer:fine)').matches) return;
+      var dotCursor=document.querySelector('.cursor-dot');
+      if(!dotCursor) return;
+      document.body.classList.add('has-custom-cursor');
+      function place(x,y){dotCursor.style.transform='translate('+x+'px,'+y+'px) translate(-50%,-50%)';}
+      function updateColor(target){
+        var inDark = target.closest('footer.site-footer');
+        dotCursor.classList.toggle('white', !!inDark);
+      }
+      place(window.innerWidth/2,window.innerHeight/2);
+      document.addEventListener('mousemove',function(e){
+        place(e.clientX,e.clientY);
+        updateColor(e.target);
+      });
+      document.querySelectorAll('a').forEach(function(el){
+        el.addEventListener('mouseenter',function(){dotCursor.classList.add('is-link');updateColor(el);});
+        el.addEventListener('mouseleave',function(){dotCursor.classList.remove('is-link');});
+      });
+      document.addEventListener('mouseleave',function(){dotCursor.style.opacity='0';});
+      document.addEventListener('mouseenter',function(){dotCursor.style.opacity='1';});
+    })();
+
+    (function(){
+      // mobile menu toggle: close when link clicked or Esc pressed
+      var cb=document.getElementById('navToggle'), m=document.querySelector('.mobile-menu');
+      if(!cb||!m) return;
+      m.querySelectorAll('a').forEach(function(a){a.addEventListener('click',function(){cb.checked=false;});});
+      document.addEventListener('keydown',function(e){if(e.key==='Escape')cb.checked=false;});
+    })();
+
+    (function(){
+      // sync .open class with checkbox so hamburger becomes X reliably
+      var cb=document.getElementById('navToggle'), toggle=document.querySelector('.menu-toggle'), m=document.querySelector('.mobile-menu');
+      if(!cb||!toggle) return;
+      function sync(){ if(cb.checked) toggle.classList.add('open'); else toggle.classList.remove('open'); }
+      cb.addEventListener('change', sync);
+      toggle.addEventListener('click', function(){ setTimeout(sync, 10); });
+      if(m) m.querySelectorAll('a').forEach(function(a){ a.addEventListener('click', function(){ cb.checked=false; sync(); }); });
+    })();
+
+    (function(){
+      // back to top: shows once you've scrolled down a bit
+      var btn=document.querySelector('.to-top');
+      if(!btn) return;
+      function toggle(){ btn.classList.toggle('is-visible', window.scrollY > 400); }
+      toggle();
+      window.addEventListener('scroll', toggle);
+      btn.addEventListener('click', function(){
+        window.scrollTo({top:0, behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'});
+      });
+    })();
+  </script>
+</body>
+</html>
